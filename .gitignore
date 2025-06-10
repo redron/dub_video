@@ -27,9 +27,11 @@ htmlcov/
 
 # Data and outputs
 data/
-*.mp3
-*.mp4
-*.vtt
+*_dub.mp4
+*_dub.mp3
+# Keep test data
+!tests/data/
+!tests/data/**
 
 # OS
 .DS_Store

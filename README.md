@@ -75,10 +75,16 @@ python -m dubber --data-dir data --video video_name
 ```
 
 This will:
+- Load the original video from `data/video_name/video_name.mp4`
 - Read the VTT subtitles from `data/video_name/video_name.vtt`
 - Generate speech for each subtitle using OpenAI's TTS API (model: gpt-4o-mini-tts, voice: coral)
-- Preserve the original timing from the VTT file
-- Create a dubbed audio file at `data/video_name/video_name_dub.mp3`
+- Mute the original audio during subtitle timings
+- Overlay the generated speech at the correct times
+- Create two output files:
+  - `data/video_name/video_name_dub.mp4` - Dubbed video with synchronized audio
+  - `data/video_name/video_name_dub.mp3` - Dubbed audio track separately
+
+The output video retains the original soundtrack, but mutes it during dubbed phrases, creating a seamless viewing experience. The separate audio file contains the complete dubbed soundtrack.
 
 ### With voice configuration (future feature):
 ```bash
