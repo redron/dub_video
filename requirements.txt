@@ -1,6 +1,6 @@
 yt-dlp>=2024.4.10
 ffmpeg-python>=0.2.0
-moviepy>=1.0.3
+moviepy>=2.2.1
 youtube-transcript-api>=0.6.2
 openai-whisper>=20230314
 pytest>=8.1.0

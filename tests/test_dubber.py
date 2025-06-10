@@ -50,9 +50,12 @@ def test_dubber_integration():
         pytest.skip(f"VTT file not found at {vtt_path}. Run test_video_preparer first.")
     
     # Clean up any previous dubber output
-    output_path = video_dir / f"{VIDEO_NAME}_dub.mp3"
-    if output_path.exists():
-        output_path.unlink()
+    output_video_path = video_dir / f"{VIDEO_NAME}_dub.mp4"
+    output_audio_path = video_dir / f"{VIDEO_NAME}_dub.mp3"
+    if output_video_path.exists():
+        output_video_path.unlink()
+    if output_audio_path.exists():
+        output_audio_path.unlink()
     
     cmd = [
         sys.executable,
@@ -97,13 +100,35 @@ def test_dubber_integration():
         f"Output:\n{full_output}"
     )
 
-    # Check that the dubbed audio file was created
-    assert output_path.exists(), f"Dubbed audio file was not created at {output_path}"
+    # Check that both output files were created
+    assert output_video_path.exists(), f"Dubbed video file was not created at {output_video_path}"
+    assert output_audio_path.exists(), f"Dubbed audio file was not created at {output_audio_path}"
     
-    # Check that the file has some size (not empty)
-    file_size = output_path.stat().st_size
-    assert file_size > 1000, f"Dubbed audio file seems too small: {file_size} bytes"
+    # Check video file size
+    video_size = output_video_path.stat().st_size
+    assert video_size > 10000, f"Dubbed video file seems too small: {video_size} bytes"
     
-    print(f"✅ Successfully created dubbed audio:")
-    print(f"   🎵 File: {output_path.name}")
-    print(f"   📏 Size: {file_size:,} bytes") 
+    # Check audio file size
+    audio_size = output_audio_path.stat().st_size
+    assert audio_size > 1000, f"Dubbed audio file seems too small: {audio_size} bytes"
+    
+    # Verify it's a valid video file by checking with moviepy
+    try:
+        from moviepy import VideoFileClip
+        video = VideoFileClip(str(output_video_path))
+        duration = video.duration
+        has_audio = video.audio is not None
+        video.close()
+        
+        assert duration > 0, "Dubbed video has no duration"
+        assert has_audio, "Dubbed video has no audio track"
+        
+        print(f"✅ Successfully created dubbed outputs:")
+        print(f"   🎬 Video file: {output_video_path.name}")
+        print(f"   📏 Video size: {video_size:,} bytes")
+        print(f"   🎵 Audio file: {output_audio_path.name}")
+        print(f"   📏 Audio size: {audio_size:,} bytes")
+        print(f"   ⏱️  Duration: {duration:.1f} seconds")
+        print(f"   🔊 Has audio: {has_audio}")
+    except Exception as e:
+        pytest.fail(f"Failed to verify video file: {e}") 
