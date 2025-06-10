@@ -1,0 +1,11 @@
+yt-dlp>=2024.4.10
+ffmpeg-python>=0.2.0
+moviepy>=1.0.3
+youtube-transcript-api>=0.6.2
+openai-whisper>=20230314
+pytest>=8.1.0
+
+openai>=1.23.0         
+webvtt-py>=0.4.6       
+pydub>=0.25.1
+python-dotenv>=1.0.1
