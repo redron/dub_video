@@ -49,6 +49,42 @@ For more options and details, run:
 python video_preparer.py --help
 ```
 
+## Dubbing a video
+
+Once you have prepared video data (video, audio, and VTT file), you can use the `dubber` module to generate a dubbed audio track using OpenAI's Text-to-Speech API.
+
+### Configuration
+
+The dubber requires an OpenAI API key. You can provide it in two ways:
+
+1. **Using a .env file** (recommended):
+   Create a `.env` file in the project root:
+   ```
+   OPENAI_API_KEY=your-openai-api-key-here
+   ```
+   (See `.env.sample` for an example)
+
+2. **Using environment variable**:
+   ```bash
+   export OPENAI_API_KEY=your-openai-api-key-here
+   ```
+
+### Basic usage:
+```bash
+python -m dubber --data-dir data --video video_name
+```
+
+This will:
+- Read the VTT subtitles from `data/video_name/video_name.vtt`
+- Generate speech for each subtitle using OpenAI's TTS API (model: gpt-4o-mini-tts, voice: coral)
+- Preserve the original timing from the VTT file
+- Create a dubbed audio file at `data/video_name/video_name_dub.mp3`
+
+### With voice configuration (future feature):
+```bash
+python -m dubber --data-dir data --video video_name --config voice.config
+```
+
 ## Running the integration tests
 
 We use **pytest**.
@@ -62,3 +98,40 @@ pytest -m "not slow"
 
 # 2 · full integration – actually downloads a pair of 5-second clips
 pytest -m slow
+```
+
+### Running integration tests in order
+
+The integration tests need to be run in a specific order:
+1. **video_preparer** tests first (to download and prepare test data)
+2. **dubber** tests second (uses the prepared data)
+
+#### Configuration for tests
+
+You can configure the tests using either:
+
+1. **A .env file** (recommended):
+   ```
+   # .env
+   RUN_NETWORK_TESTS=1
+   OPENAI_API_KEY=your-api-key
+   ```
+
+2. **Environment variables**:
+   ```bash
+   export RUN_NETWORK_TESTS=1
+   export OPENAI_API_KEY=your-api-key
+   ```
+
+#### Running the tests
+
+```bash
+# With .env file configured
+./run_integration_tests.sh
+
+# Or manually:
+pytest tests/test_video_preparer.py -v
+pytest tests/test_dubber.py -v
+```
+
+Note: The dubber tests require an OpenAI API key and will make actual API calls to generate speech.
