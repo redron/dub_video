@@ -143,7 +143,7 @@ async def process_url(url: str, model_size: str, output_dir: str):
     root.mkdir(parents=True, exist_ok=True)
 
     video_path = root / f"{name}.mp4"
-    audio_path = root / f"{name}.mp3"
+    audio_path = root / name
     vtt_path = root / f"{name}.vtt"
 
     if not video_path.exists():
@@ -152,7 +152,9 @@ async def process_url(url: str, model_size: str, output_dir: str):
     else:
         print(f"  [*] Video already exists for '{name}'.")
 
-    if not audio_path.exists():
+    actual_audio_path = Path(str(audio_path) + ".mp3")
+    
+    if not actual_audio_path.exists():
         print(f"  [*] Extracting audio for '{name}'…")
         await download_audio(url, audio_path)
     else:
@@ -171,7 +173,7 @@ async def process_url(url: str, model_size: str, output_dir: str):
         print(f"    → YouTube transcript not available for '{name}' ({type(e).__name__}). Falling back to Whisper.")
 
     if not transcript_ready:
-        await whisper_to_vtt(audio_path, vtt_path, model_size)
+        await whisper_to_vtt(actual_audio_path, vtt_path, model_size)
         print(f"    → Whisper generated VTT for '{name}'.")
 
     print(f"\n✅ All files for '{name}' saved in: {root.resolve()}")
